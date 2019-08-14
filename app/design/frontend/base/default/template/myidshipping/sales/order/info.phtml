@@ -56,8 +56,8 @@
             $clm24_model = Mage::getModel("myidshipping/ordergrid")->getCollection()
             ->addFieldToFilter('main_table.order_id', array('eq' => $_order->getIncrementId()))->getFirstItem();
             $orderData = $clm24_model->getEntityId();
-			if($orderData){
-	    $resource = Mage::getSingleton('core/resource');
+	if($orderData){
+	    /*$resource = Mage::getSingleton('core/resource');
 	    $readConnection = $resource->getConnection('core_read');
 	    $writeConnection = $resource->getConnection('core_write');
 	    $table = $resource->getTableName('myidshipping/shipping');
@@ -66,17 +66,17 @@
 	    $query = "select value from ".$table." where order_grid_id ='".$orderData."' and attribute ='lastname'";			
 	    $lastname = $readConnection->fetchOne($query);
 	    $query = "select value from ".$table." where order_grid_id ='".$orderData."' and attribute ='email'";			
-	    $email = $readConnection->fetchOne($query);
-	    $name = $firstname . '<br/>' .$email; 
+	    $email = $readConnection->fetchOne($query);*/
+	    $name = 	$clm24_model->getRName() . '<br/>' .$clm24_model->getEmail();
 	?>
 				<address>
 	<?php echo $name ?></br>			    
                 <?php echo Mage::getStoreConfig('clm24core/shippings/ship2myid_label');?></br>
                 <?php echo Mage::getStoreConfig('clm24core/shippings/street_line1');?></br>
-                 <?php echo Mage::getStoreConfig('clm24core/shippings/street_line2');?></br>
-                  <?php echo Mage::getStoreConfig('clm24core/shippings/city');?></br>
-                  <?php echo "XXXXX"?></br>
-                  <?php echo "XX"?></br>
+                <?php echo Mage::getStoreConfig('clm24core/shippings/street_line2');?></br>
+                <?php echo "XX";//Mage::getStoreConfig('clm24core/shippings/city');?></br>
+                <?php echo "XXXXX"?></br>
+                <?php echo "XX"?></br>
                 </address>
 			<?php }else{
 			?>

@@ -21,13 +21,16 @@
 $installer = $this;
 /* @var $installer Mage_Core_Model_Resource_Setup */
 $this->startSetup()->run("
-CREATE TABLE {$this->getTable('clm24_myidshipping_ordergrid')} (
+CREATE TABLE IF NOT EXISTS {$this->getTable('clm24_myidshipping_ordergrid')} (
   `entity_id` int(10) unsigned NOT NULL auto_increment,
   `order_id` int(10) unsigned NOT NULL COMMENT 'Order Id',  
   `real_order_id` varchar(255) DEFAULT NULL,
   `order_status_id` int(11) DEFAULT NULL COMMENT '0: Pending, 1: Accepted, 2: Rejected, 3: Completed',
   `order_group_id` varchar(255) DEFAULT NULL,
   `max_shipment` int(10) unsigned NOT NULL,
+  `email` VARCHAR( 255 ) NULL DEFAULT NULL,
+  `r_name` VARCHAR( 255 ) NULL DEFAULT NULL,
+  `r_telephone` VARCHAR( 25 ) NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL COMMENT 'Created At',
   `updated_at` timestamp NULL DEFAULT NULL COMMENT 'Updated At',
   PRIMARY KEY  (`entity_id`)

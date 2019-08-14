@@ -901,7 +901,7 @@ class Xclm24_Myidshipping_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         if (isset($region_name) && $region_name != "") {
-            $query = "SELECT region_id FROM directory_country_region_name WHERE name ='" . $region_name . "'";
+            $query = "SELECT region_id FROM `".$resource->getTableName('directory_country_region_name')."` WHERE name ='" . $region_name . "'";
             $regionid = $readConnection->fetchOne($query);
             if (isset($regionid) && $regionid != "") {
 	$region_id = $regionid;
@@ -909,7 +909,7 @@ class Xclm24_Myidshipping_Helper_Data extends Mage_Core_Helper_Abstract
 	$region_name = $region_name;
             }
         } elseif (isset($data['region']) && $data['region'] != "") {
-            $query = "SELECT region_id FROM directory_country_region_name WHERE name ='" . $data['region'] . "'";
+            $query = "SELECT region_id FROM `".$resource->getTableName('directory_country_region_name')."` WHERE name ='" . $data['region'] . "'";
             $regionid = $readConnection->fetchOne($query);
             if (isset($regionid) && $regionid != "") {
 	$region_id = $regionid;

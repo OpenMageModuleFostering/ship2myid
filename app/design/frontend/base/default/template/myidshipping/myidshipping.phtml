@@ -29,7 +29,7 @@ if(isset($marketplace_details['Marketplace']['marketplace_image']) && !empty($ma
         $popup_url .= '&image=' . urlencode($marketplace_details['Marketplace']['marketplace_image']);
 }
 
-$popup_url .= '&callback=' .  $this->getUrl('myidshipping/index/postback');
+$popup_url .= '&callback=' .  $this->getUrl('myidshipping/index/postback',array('_secure'=>true));
 
 ?>
 

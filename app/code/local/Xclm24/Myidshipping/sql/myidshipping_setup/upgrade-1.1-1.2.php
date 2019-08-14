@@ -21,12 +21,12 @@
 $installer = $this;
 /* @var $installer Mage_Core_Model_Resource_Setup */
 
-$this->startSetup()->run("
-DROP TABLE IF EXISTS {$this->getTable('clm24_myidshipping')};
-")->endSetup();
+/*$this->startSetup()->run("
+ALTER  TABLE `{$this->getTable('clm24_myidshipping')}` RENAME `{$this->getTable('clm24_myidshipping')}_old` ;
+")->endSetup();*/
 
 $this->startSetup()->run("
-CREATE TABLE {$this->getTable('clm24_myidshipping')} (
+CREATE TABLE IF NOT EXISTS {$this->getTable('clm24_myidshipping')} (
   `entity_id` int(10) unsigned NOT NULL auto_increment,
   `order_grid_id` int(10) unsigned NOT NULL COMMENT 'Order grid Id',
   `attribute` varchar(255) DEFAULT NULL,

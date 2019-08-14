@@ -22,7 +22,7 @@
 <config>
     <modules>
         <Xclm24_Myidshipping>
-            <version>1.4</version>
+            <version>1.4.1</version>
         </Xclm24_Myidshipping>
     </modules>
 
@@ -298,7 +298,7 @@
                     <cron_expr>*/5 * * * *</cron_expr>
                 </schedule>
                 <run>
-                    <model>myidshipping/cron::scheduler</model>
+                    <model>myidshipping/cron::batchscheduler</model>
                 </run>
             </clm24core_scheduler>
             <clm24core_scheduler_cancel>

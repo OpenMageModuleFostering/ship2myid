@@ -175,12 +175,19 @@ class Xclm24_Myidshipping_Model_Order extends Mage_Sales_Model_Order
 
 			$countryName = $countryModel->getName();		
  
+			//$clm24shipping_address = $clm24shipping_address . Mage::getStoreConfig('clm24core/shippings/ship2myid_label') . "<br>";
+			//$clm24shipping_address = $clm24shipping_address . Mage::getStoreConfig('clm24core/shippings/street_line1') . "<br>";
+			//$clm24shipping_address = $clm24shipping_address . Mage::getStoreConfig('clm24core/shippings/street_line2') . "<br>";
+			//$clm24shipping_address = $clm24shipping_address . Mage::getStoreConfig('clm24core/shippings/city') . "<br>";
+			//$clm24shipping_address = $clm24shipping_address . $postcode . "<br>";
+			//$clm24shipping_address = $clm24shipping_address . $countryName . "<br>";
 			$clm24shipping_address = $clm24shipping_address . Mage::getStoreConfig('clm24core/shippings/ship2myid_label') . "<br>";
 			$clm24shipping_address = $clm24shipping_address . Mage::getStoreConfig('clm24core/shippings/street_line1') . "<br>";
 			$clm24shipping_address = $clm24shipping_address . Mage::getStoreConfig('clm24core/shippings/street_line2') . "<br>";
 			$clm24shipping_address = $clm24shipping_address . Mage::getStoreConfig('clm24core/shippings/city') . "<br>";
-			$clm24shipping_address = $clm24shipping_address . $postcode . "<br>";
-			$clm24shipping_address = $clm24shipping_address . $countryName . "<br>";
+			$clm24shipping_address = $clm24shipping_address . 'XXXXX' . "<br>";
+			$clm24shipping_address = $clm24shipping_address . 'XX' . "<br>";
+			
 			
 			$flag_ship2myid = 1; 	
 			

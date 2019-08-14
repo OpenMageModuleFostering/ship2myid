@@ -21,7 +21,7 @@
 $installer = $this;
 /* @var $installer Mage_Core_Model_Resource_Setup */
 $this->startSetup()->run("
-CREATE TABLE {$this->getTable('clm24_myidcoupon')} (
+CREATE TABLE IF NOT EXISTS  {$this->getTable('clm24_myidcoupon')} (
   `entity_id` int(10) unsigned NOT NULL auto_increment,
   `rule_id` int(10) unsigned NOT NULL COMMENT 'Rule Id fo salesrule',
   `ship2myid_only` smallint(6) unsigned DEFAULT NULL COMMENT 'For ship2myid only',

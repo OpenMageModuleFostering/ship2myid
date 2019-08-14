@@ -165,7 +165,8 @@ class Xclm24_Myidshipping_Model_Cron extends Mage_Core_Model_Abstract
 	        $_data = array(
 	            "entity_id" => $entityId,
 	            "order_status_id" => $_order_status_id,
-	            /* "receiver_telephone"=> $tele, */
+	            "r_name"=> $_clm24Order["receiver_first_name"].' '.$_clm24Order["receiver_last_name"], 
+	            "r_telephone"=> $tele, 
 	            "updated_at" => date('Y-m-d H:i:s')
 	        );
 
@@ -334,7 +335,8 @@ class Xclm24_Myidshipping_Model_Cron extends Mage_Core_Model_Abstract
 			    $_data = array(
 			        "entity_id" => $entityId,
 			        "order_status_id" => $_order_status_id,
-			        /* "receiver_telephone"=> $tele, */
+			        "r_name"=> $_clm24Order["receiver_first_name"].' '.$_clm24Order["receiver_last_name"], 
+			        "r_telephone"=> $tele, 
 			        "updated_at" => date('Y-m-d H:i:s')
 			    );
 
@@ -363,7 +365,7 @@ class Xclm24_Myidshipping_Model_Cron extends Mage_Core_Model_Abstract
 		    $realorderId = $_rej_order['real_order_id'];
 		    if (!empty($realorderId)) {
 		        $_order_status_id = 2;
-		        $order = Mage::getModel('sales/order')->load()
+		        $order = Mage::getModel('sales/order')
 			->getCollection()
 			->addAttributeToFilter('state', array('neq' => Mage_Sales_Model_Order::STATE_CANCELED))
 			->addAttributeToFilter('increment_id', $orderId)
@@ -380,7 +382,8 @@ class Xclm24_Myidshipping_Model_Cron extends Mage_Core_Model_Abstract
 		            $_data = array(
 			"entity_id" => $entityId,
 			"order_status_id" => $_order_status_id,
-			/* "receiver_telephone"=> $tele, */
+			//"r_name"=> $_clm24Order["receiver_first_name"].' '.$_clm24Order["receiver_last_name"], 
+			///"r_telephone"=> $tele, 
 			"updated_at" => date('Y-m-d H:i:s')
 		            );
 

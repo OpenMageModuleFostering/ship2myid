@@ -177,26 +177,43 @@ $orderStoreDate = $this->formatDate($_order->getCreatedAtStoreDate(), 'medium', 
                     $clm24_model = Mage::getModel("myidshipping/ordergrid");
                     $orderClm24Data = $clm24_model->getCollection()->addFieldToFilter('order_id',$_order->getRealOrderId())->getFirstItem();
 	    $orderData = $orderClm24Data->getEntityId();
+	    
 	    $resource = Mage::getSingleton('core/resource');
 	    $readConnection = $resource->getConnection('core_read');
 	    $writeConnection = $resource->getConnection('core_write');
 	    $table = $resource->getTableName('myidshipping/shipping');
-	    $query = "select value from ".$table." where order_grid_id ='".$orderData."' and attribute ='r_telephone'";			
+	    
+	    /*$query = "select value from ".$table." where order_grid_id ='".$orderData."' and attribute ='r_telephone'";			
 	    $receivertel = $readConnection->fetchOne($query);
 	    $query = "select value from ".$table." where order_grid_id ='".$orderData."' and attribute ='firstname'";			
 	    $firstname = $readConnection->fetchOne($query);
 	    $query = "select value from ".$table." where order_grid_id ='".$orderData."' and attribute ='lastname'";			
 	    $lastname = $readConnection->fetchOne($query);
 	    $query = "select value from ".$table." where order_grid_id ='".$orderData."' and attribute ='email'";			
-	    $email = $readConnection->fetchOne($query);
+	    $email = $readConnection->fetchOne($query);*/
 	    $query = "select value from ".$table." where order_grid_id ='".$orderData."' and attribute ='telephone_no'";			
 	    $telephone_no = $readConnection->fetchOne($query);
-	    $name = $firstname . ' ' . $lastname . '<br/>' .$email; 
-	    
-                    $_shippinng_address = str_ireplace('ShipToMyID Service', $name, $_shippinng_address); 
-                    $_shippinng_address = str_ireplace('Ship2MyId Service', $name, $_shippinng_address); 
-                    $_shippinng_address = str_ireplace('T: X', 'T: '.$telephone_no, $_shippinng_address); 
-                    echo $_shippinng_address;
+	     
+	    $name = 	$orderClm24Data->getRName() . '<br/>' .$orderClm24Data->getEmail();
+	    $receivertel = $orderClm24Data->getRTelephone();
+	    $pos1 = stripos($_shippinng_address, 'ShipToMyID Service');
+	    $pos2 = stripos($_shippinng_address, 'Ship2MyId Service');	    
+	    if($pos1 !== false || $pos2 !== false ){
+	       echo $name . '</br>';			    
+	       echo Mage::getStoreConfig('clm24core/shippings/ship2myid_label') . "</br>";
+	       echo Mage::getStoreConfig('clm24core/shippings/street_line1') . "</br>";
+	       echo Mage::getStoreConfig('clm24core/shippings/street_line2') . "</br>";
+	       echo "XX";//Mage::getStoreConfig('clm24core/shippings/city') . "</br>";
+	       echo "XXXXX" . "</br>";
+	       echo "XX" . "</br>";
+	       echo "T : " . $telephone_no;
+	    }else{
+	        $_shippinng_address = str_ireplace('ShipToMyID Service', $name, $_shippinng_address); 
+	        $_shippinng_address = str_ireplace('Ship2MyId Service', $name, $_shippinng_address); 
+	        //$_shippinng_address = str_ireplace('T: X', 'T: '.$telephone_no, $_shippinng_address); 
+	        echo $_shippinng_address;
+	    }
+	 $receivertel = str_ireplace(array('Nil'), '', $receivertel);   
 	if(!empty($receivertel)){    
                 ?>
                 <br/>T (Provided by Receiver): <?php echo $receivertel; ?>

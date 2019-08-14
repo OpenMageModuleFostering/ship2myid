@@ -14,7 +14,7 @@
 
 #lightwindow_iframe{
     /*background-color: #285ea0; */
-	background:url("../../images/mapmyid/backgroundlight.png");
+	background:url("../../images/mapmyid/backgroundlight.jpg");
     padding-top: 5px;
 	vertical-align: middle;
 }
@@ -59,7 +59,7 @@
 		position: relative;
 		border: 10px solid #ffffff;
 		/*background-color: #285ea0;*/
-		background:url("../../images/mapmyid/backgroundlight.png");
+		background:url("../../images/mapmyid/backgroundlight.jpg");
                 padding: 0px !important;
 	}		
 
