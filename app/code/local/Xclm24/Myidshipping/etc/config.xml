@@ -1,0 +1,315 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * MapMyId Inc.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * 
+ * Do not edit or add to this file if you wish to upgrade the to newer versions in the future.
+ *
+ * @category  MapMyId Inc.
+ * @package   Xclm24_Myidshipping
+ * @version   1.3.0
+ * @author    MapMyId Inc. Team <developer@ship2myid.com>
+ * @copyright Copyright (C) 2013 MapMyId Inc. (http://www.mapmyid.com/)
+ */
+ -->
+<config>
+    <modules>
+        <Xclm24_Myidshipping>
+            <version>1.3</version>
+        </Xclm24_Myidshipping>
+    </modules>
+
+    <global>
+        <blocks>
+            <myidshipping>
+                <class>Xclm24_Myidshipping_Block</class>
+            </myidshipping>
+            <adminhtml>
+                <rewrite>
+                    <promo_quote_edit_tab_main>Xclm24_Myidshipping_Block_Adminhtml_Promo_Quote_Edit_Tab_Main</promo_quote_edit_tab_main>
+                </rewrite>
+            </adminhtml>
+            <giftmessage>
+                <rewrite>
+                    <message_inline>Xclm24_Myidshipping_Block_GiftMessage_Message_Inline</message_inline>
+                </rewrite>
+            </giftmessage>
+        </blocks>
+
+        <models>
+            <myidshipping>
+                <class>Xclm24_Myidshipping_Model</class>
+                <resourceModel>myidshipping_resource</resourceModel>
+            </myidshipping>
+            <myidshipping_resource>
+                <class>Xclm24_Myidshipping_Model_Resource</class>
+                <entities>
+                    <shipping>
+                        <table>clm24_myidshipping</table>
+                    </shipping>
+                    <ordergrid>
+                        <table>clm24_myidshipping_ordergrid</table>
+                    </ordergrid>
+                    <coupon>
+                        <table>clm24_myidcoupon</table>
+                    </coupon>
+                </entities>
+            </myidshipping_resource>
+            <paypal>
+                <rewrite>
+                    <api_standard>Xclm24_Myidshipping_Model_Api_Standard</api_standard>
+                    <api_nvp>Xclm24_Myidshipping_Model_Api_Nvp</api_nvp>
+                </rewrite>
+            </paypal>
+            <sales>
+                <rewrite>
+                    <order>Xclm24_Myidshipping_Model_Order</order>
+                    <order_invoice>Xclm24_Myidshipping_Model_Order_Invoice</order_invoice>
+                    <order_shipment>Xclm24_Myidshipping_Model_Order_Shipment</order_shipment>
+                    <order_creditmemo>Xclm24_Myidshipping_Model_Order_Creditmemo</order_creditmemo>
+                </rewrite>
+            </sales>
+        </models>
+			
+        <helpers>
+            <myidshipping>
+                <class>Xclm24_Myidshipping_Helper</class>
+            </myidshipping>
+        </helpers>
+
+        <resources>
+            <myidshipping_setup>
+                <setup>
+                    <module>Xclm24_Myidshipping</module>
+                    <class>Xclm24_Myidshipping_Model_Resource_Eav_Mysql4_Setup</class>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </myidshipping_setup>
+            <myidshipping_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </myidshipping_write>
+            <myidshipping_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </myidshipping_read>
+        </resources>
+			
+        <events>
+            <controller_action_postdispatch>
+                <observers>
+                    <controller_action_after>
+                        <class>myidshipping/observer</class>
+                        <method>billingPostDispatch</method>
+                    </controller_action_after>
+                </observers>
+            </controller_action_postdispatch>
+            <payment_method_is_active>
+                <observers>
+                    <clm24_myidshipping_observer>
+                        <type>singleton</type>
+                        <class>myidshipping/observer</class>
+                        <method>paymentMethodCheck</method>
+                    </clm24_myidshipping_observer>
+                </observers>
+            </payment_method_is_active>
+            
+            <sales_order_place_after>
+                <observers>
+                    <clm24_myidshipping_observer>
+                        <type>singleton</type>
+                        <class>myidshipping/observer</class>
+                        <method>salesOrderPlaceAfter</method>
+                    </clm24_myidshipping_observer>
+                </observers>
+            </sales_order_place_after>
+			
+            <sales_order_save_after>
+                <observers>
+                    <clm24_myidshipping_observer>
+                        <type>singleton</type>
+                        <class>myidshipping/observer</class>
+                        <method>salesOrderSaveAfter</method>
+                    </clm24_myidshipping_observer>
+                </observers>
+            </sales_order_save_after>
+			
+        </events>
+			
+        <template>
+            <email>
+                <clm24_email_order_template translate="label" module="myidshipping">
+                    <label>New Ship2MyID Order</label>
+                    <file>sales/clm24/order_new.html</file>
+                    <type>html</type>
+                </clm24_email_order_template>
+                <clm24_email_order_guest_template translate="label" module="myidshipping">
+                    <label>New Ship2MyID Order for Guest</label>
+                    <file>sales/clm24/order_new_guest.html</file>
+                    <type>html</type>
+                </clm24_email_order_guest_template>
+                <clm24_email_invoice_template translate="label" module="myidshipping">
+                    <label>New Ship2MyID Invoice</label>
+                    <file>sales/clm24/invoice_new.html</file>
+                    <type>html</type>
+                </clm24_email_invoice_template>
+                <clm24_email_invoice_guest_template translate="label" module="myidshipping">
+                    <label>New Ship2MyID Invoice for Guest</label>
+                    <file>sales/clm24/invoice_new_guest.html</file>
+                    <type>html</type>
+                </clm24_email_invoice_guest_template>
+                <clm24_email_creditmemo_template translate="label" module="myidshipping">
+                    <label>New Ship2MyID Credit Memo</label>
+                    <file>sales/clm24/creditmemo_new.html</file>
+                    <type>html</type>
+                </clm24_email_creditmemo_template>
+                <clm24_email_creditmemo_guest_template translate="label" module="myidshipping">
+                    <label>New Ship2MyID Credit Memo for Guest</label>
+                    <file>sales/clm24/creditmemo_new_guest.html</file>
+                    <type>html</type>
+                </clm24_email_creditmemo_guest_template>
+                <clm24_email_shipment_template translate="label" module="myidshipping">
+                    <label>New Ship2MyID Shipment</label>
+                    <file>sales/clm24/shipment_new.html</file>
+                    <type>html</type>
+                </clm24_email_shipment_template>
+                <clm24_email_shipment_guest_template translate="label" module="myidshipping">
+                    <label>New Ship2MyID Shipment for Guest</label>
+                    <file>sales/clm24/shipment_new_guest.html</file>
+                    <type>html</type>
+                </clm24_email_shipment_guest_template>
+            </email>
+        </template>
+    </global>
+
+    <frontend>
+        <routers>
+            <myidshipping>
+                <use>standard</use>
+                <args>
+                    <module>Xclm24_Myidshipping</module>
+                    <frontName>myidshipping</frontName>
+                </args>
+            </myidshipping>
+        </routers>
+
+        <layout>
+            <updates>
+                <custom>
+                    <file>myidshipping.xml</file>
+                </custom>
+            </updates>
+        </layout>
+    </frontend>
+	
+    <adminhtml>
+        <events>
+            <sales_order_grid_collection_load_before>
+                <observers>
+                    <clm24_myidshipping_observer>
+                        <model>myidshipping/observer</model>
+                        <method>salesOrderGridCollectionLoadBefore</method>
+                    </clm24_myidshipping_observer>
+                </observers>
+            </sales_order_grid_collection_load_before>
+            <core_block_abstract_prepare_layout_before>
+                <observers>
+                    <clm24_myidshipping_observer>
+                        <type>model</type>
+                        <class>myidshipping/observer</class>
+                        <method>addColumn</method>
+                    </clm24_myidshipping_observer>
+                </observers>
+            </core_block_abstract_prepare_layout_before>  
+            <salesrule_rule_save_after>
+                <observers>
+                    <clm24_myidshipping_observer>
+                        <model>myidshipping/observer</model>
+                        <method>setShip2myidOnlyCoupon</method>
+                    </clm24_myidshipping_observer>
+                </observers>
+            </salesrule_rule_save_after>           
+        </events>
+        <layout>
+            <updates>
+                <custom>
+                    <file>myidshipping.xml</file> 
+                </custom>
+            </updates>
+        </layout>
+    </adminhtml>
+    <default>
+        <clm24core>
+            <shippings>
+                <clm24Url>https://hotfix-app.ship2myid.com/ship2myid/rest</clm24Url>
+                <clm24TermsUrl>https://www.ship2myid.com/terms-of-use</clm24TermsUrl>
+                <clm24PrivacyUrl>https://www.ship2myid.com/privacy</clm24PrivacyUrl>
+                <street_line1>The shipping address is protected by Ship2MyID.</street_line1>
+                <street_line2>X</street_line2>
+                <city>X</city>
+                <region_id>12</region_id>
+                <defaultZipCode>98004</defaultZipCode>
+                <country_id>US</country_id>
+                <telephone>X</telephone>
+                <ship2myid_label>shiptomyid</ship2myid_label>
+                <ytvideoid>_4yvWDuyCis</ytvideoid>
+                <clm24popurl>https://hotfix-app.ship2myid.com/ship2myid/shopping_cart_popup/index.jsp?plateform=magento</clm24popurl>
+                <clm24popwidth>600</clm24popwidth>
+                <clm24popheight>590</clm24popheight>
+                <order_status>processing</order_status>
+                <rejected_order_status>canceled</rejected_order_status>
+            </shippings>
+        </clm24core>
+        <clm24_email>
+            <order>
+                <template>clm24_email_order_template</template>
+                <guest_template>clm24_email_order_guest_template</guest_template>
+            </order>
+            <invoice>
+                <template>clm24_email_invoice_template</template>
+                <guest_template>clm24_email_invoice_guest_template</guest_template>
+            </invoice>
+            <shipment>
+                <template>clm24_email_shipment_template</template>
+                <guest_template>clm24_email_shipment_guest_template</guest_template>
+            </shipment>
+            <creditmemo>
+                <template>clm24_email_creditmemo_template</template>
+                <guest_template>clm24_email_creditmemo_guest_template</guest_template>
+            </creditmemo>
+        </clm24_email>
+    </default>
+
+    <crontab>
+        <jobs>
+            <clm24core_scheduler>
+                <schedule>
+                    <cron_expr>*/5 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>myidshipping/cron::scheduler</model>
+                </run>
+            </clm24core_scheduler>
+            <clm24core_scheduler_cancel>
+                <schedule>
+                    <cron_expr>*/10 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>myidshipping/cron::croncancelorder</model>
+                </run>
+            </clm24core_scheduler_cancel>
+        </jobs>
+    </crontab>
+
+</config>

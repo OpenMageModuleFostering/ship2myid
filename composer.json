@@ -1,0 +1,16 @@
+{
+    "name": "OpenMageModuleFostering/Ship2MyID",
+    "type": "magento-module",
+    "license": "Open-Software-License-(OSL-3.0)",
+    "homepage": "",
+    "description": "Generate new orders not possible before. Users can now ship to any cell, email or social ID. NO address needed. Ship to anyone without needing the receiver’s address. ",
+    "authors": [
+    {
+        "name": "MapMyId Inc.",
+        "email": "developer@ship2myid.com"
+    }
+],
+    "suggest": {
+        "magento-hackathon/magento-composer-installer": "*"
+    }
+}

@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * MapMyId Inc.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ * 
+ * Do not edit or add to this file if you wish to upgrade the to newer versions in the future.
+ *
+ * @category  MapMyId Inc.
+ * @package   Xclm24_Myidshipping
+ * @version   1.3.0
+ * @author    MapMyId Inc. Team <developer@ship2myid.com>
+ * @copyright Copyright (C) 2013 MapMyId Inc. (http://www.mapmyid.com/)
+ */
+-->
+<layout version="0.1.0">
+    <checkout_onepage_index>
+        <reference name="head">
+            
+			<action method="addItem" ifconfig="clm24core/shippings/enabled"><type>skin_css</type><name>css/myshipping/lightwindow.css</name></action>
+			
+			<action method="addItem" ifconfig="clm24core/shippings/enabled"><type>skin_js</type><name>js/myshipping/lightwindow.js</name></action>
+			<action method="addItem" ifconfig="clm24core/shippings/enabled"><type>skin_js</type><name>js/myshipping/inline.js</name></action>
+			
+        </reference>
+		
+		<reference name="content">
+				<reference name="checkout.onepage.billing">
+						<block type="core/template" name="myidshipping" as="myidshipping" template="myidshipping/myidshipping.phtml"/>
+				</reference>
+		</reference>
+       
+    </checkout_onepage_index>
+	
+	<midshipping_myid_popuphandler>
+        <remove name="right"/>
+        <remove name="left"/>
+
+        <block type="myidshipping/myidpopup" name="root" output="toHtml" template="myidshipping/myidpopup.phtml"/>
+	 
+	 </midshipping_myid_popuphandler>
+    
+	<checkout_onepage_shippingmethod>
+        <!-- Mage_Checkout -->
+        <remove name="right"/>
+        <remove name="left"/>
+
+        <block type="checkout/onepage_shipping_method_available" name="root" output="toHtml" template="checkout/onepage/shipping_method/available.phtml"/>
+    </checkout_onepage_shippingmethod>
+
+	 <checkout_onepage_progress_shipping>
+        <!-- Mage_Checkout -->
+        <remove name="right"/>
+        <remove name="left"/>
+
+        <block type="checkout/onepage_progress" name="root" output="toHtml" template="myidshipping/progress/shipping.phtml">
+            <action method="setInfoTemplate"><method></method><template></template></action>
+        </block>
+    </checkout_onepage_progress_shipping>
+    
+    <!--  This block is depricated in new versions  -->
+    <checkout_onepage_progress>
+        <!-- Mage_Checkout -->
+        <remove name="right"/>
+        <remove name="left"/>
+
+        <block type="checkout/onepage_progress" name="root" output="toHtml" template="myidshipping/progress/progress.phtml">
+            <block type="checkout/onepage_payment_info" name="payment_info">
+                <action method="setInfoTemplate"><method></method><template></template></action>
+            </block>
+        </block>
+    </checkout_onepage_progress>    
+    
+	
+	<sales_order_view>
+        <label>Customer My Account Order View</label>
+       
+        <reference name="my.account.wrapper">
+            <block type="sales/order_info" as="info" name="sales.order.info" template="myidshipping/sales/order/info.phtml">
+                <block type="sales/order_info_buttons" as="buttons" name="sales.order.info.buttons" />
+            </block>
+            <block type="sales/order_view" name="sales.order.view">
+                <block type="sales/order_items" name="order_items" template="sales/order/items.phtml">
+                    <action method="addItemRender"><type>default</type><block>sales/order_item_renderer_default</block><template>sales/order/items/renderer/default.phtml</template></action>
+                    <action method="addItemRender"><type>grouped</type><block>sales/order_item_renderer_grouped</block><template>sales/order/items/renderer/default.phtml</template></action>
+                    <block type="sales/order_totals" name="order_totals" template="sales/order/totals.phtml">
+                        <action method="setLabelProperties"><value>colspan="4" class="a-right"</value></action>
+                        <action method="setValueProperties"><value>class="last a-right"</value></action>
+                        <block type="tax/sales_order_tax" name="tax" template="tax/order/tax.phtml" />
+                    </block>
+                </block>
+            </block>
+        </reference>
+        <reference name="sales.order.info">
+            <action method="addLink" translate="label" module="sales"><name>view</name><path></path><label>Order Information</label></action>
+            <action method="addLink" translate="label" module="sales"><name>invoice</name><path>*/*/invoice</path><label>Invoices</label></action>
+            <action method="addLink" translate="label" module="sales"><name>shipment</name><path>*/*/shipment</path><label>Shipments</label></action>
+            <action method="addLink" translate="label" module="sales"><name>creditmemo</name><path>*/*/creditmemo</path><label>Refunds</label></action>
+        </reference>
+        <block type="core/text_list" name="additional.product.info" translate="label">
+            <label>Additional Product Info</label>
+        </block>
+    </sales_order_view>
+
+</layout>
