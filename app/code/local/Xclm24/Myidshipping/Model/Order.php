@@ -55,6 +55,10 @@ class Xclm24_Myidshipping_Model_Order extends Mage_Sales_Model_Order
     
     public function sendNewOrderEmail()
     {
+        if (version_compare(Mage::getVersion(), '1.9.1.0') >= 0) {
+            $this->queueNewOrderEmail(true);
+            return $this;
+        }
 		
         $storeId = $this->getStore()->getId();
 
@@ -213,6 +217,187 @@ class Xclm24_Myidshipping_Model_Order extends Mage_Sales_Model_Order
 
         return $this;
     }
+    
+    /**
+     * Queue email with new order data
+     *
+     * @param bool $forceMode if true then email will be sent regardless of the fact that it was already sent previously
+     *
+     * @return Mage_Sales_Model_Order
+     * @throws Exception
+     */
+
+    public function queueNewOrderEmail($forceMode = false)
+    {
+        $storeId = $this->getStore()->getId();
+
+        if (!Mage::helper('sales')->canSendNewOrderEmail($storeId)) {
+            return $this;
+        }
+        // Get the destination email addresses to send copies to
+        $copyTo = $this->_getEmails(self::XML_PATH_EMAIL_COPY_TO);
+        $copyMethod = Mage::getStoreConfig(self::XML_PATH_EMAIL_COPY_METHOD, $storeId);
+
+        // Start store emulation process
+        /** @var $appEmulation Mage_Core_Model_App_Emulation */
+        $appEmulation = Mage::getSingleton('core/app_emulation');
+        $initialEnvironmentInfo = $appEmulation->startEnvironmentEmulation($storeId);
+
+        try {
+            // Retrieve specified view block from appropriate design package (depends on emulated store)
+            $paymentBlock = Mage::helper('payment')->getInfoBlock($this->getPayment())
+                ->setIsSecureMode(true);
+            $paymentBlock->getMethod()->setStore($storeId);
+            $paymentBlockHtml = $paymentBlock->toHtml();
+        } catch (Exception $exception) {
+            // Stop store emulation process
+            $appEmulation->stopEnvironmentEmulation($initialEnvironmentInfo);
+            throw $exception;
+        }
+
+        // Stop store emulation process
+        $appEmulation->stopEnvironmentEmulation($initialEnvironmentInfo);
+
+        // Retrieve corresponding email template id and customer name
+        if ($this->getCustomerIsGuest()) {
+            $templateId = Mage::getStoreConfig(self::XML_PATH_EMAIL_GUEST_TEMPLATE, $storeId);
+            $customerName = $this->getBillingAddress()->getName();
+        } else {
+            $templateId = Mage::getStoreConfig(self::XML_PATH_EMAIL_TEMPLATE, $storeId);
+            $customerName = $this->getCustomerName();
+        }
+
+        /** @var $mailer Mage_Core_Model_Email_Template_Mailer */
+        $mailer = Mage::getModel('core/email_template_mailer');
+        /** @var $emailInfo Mage_Core_Model_Email_Info */
+        $emailInfo = Mage::getModel('core/email_info');
+        $emailInfo->addTo($this->getCustomerEmail(), $customerName);
+        if ($copyTo && $copyMethod == 'bcc') {
+            // Add bcc to customer email
+            foreach ($copyTo as $email) {
+                $emailInfo->addBcc($email);
+            }
+        }
+        $mailer->addEmailInfo($emailInfo);
+
+        // Email copies are sent as separated emails if their copy method is 'copy'
+        if ($copyTo && $copyMethod == 'copy') {
+            foreach ($copyTo as $email) {
+                $emailInfo = Mage::getModel('core/email_info');
+                $emailInfo->addTo($email);
+                $mailer->addEmailInfo($emailInfo);
+            }
+        }
+
+        // Set all required params and send emails
+        $mailer->setSender(Mage::getStoreConfig(self::XML_PATH_EMAIL_IDENTITY, $storeId));
+        $mailer->setStoreId($storeId);
+        $mailer->setTemplateId($templateId);
+
+		//ship2myid Email Hide
+		$order_id = $this->getIncrementId(); 
+		if (Mage::getStoreConfig('clm24core/shippings/debug') == 1)
+			Mage::Log("Clm24 [Order_id]: ".print_r($order_id, true));
+		
+		
+		$clm24_model = Mage::getModel("myidshipping/ordergrid")->getCollection()
+                        ->addFieldToFilter('main_table.order_id', array('eq' => $order_id));
+		$orderData = $clm24_model->getData();
+		//zend_debug::dump($orderData);
+		
+		if (Mage::getStoreConfig('clm24core/shippings/debug') == 1)
+			Mage::Log("Clm24 [ship2myid_order_data]: ".print_r($order_id, true));		
+		
+		$cnt = count($orderData);
+		
+		if (Mage::getStoreConfig('clm24core/shippings/debug') == 1)
+			Mage::Log("Clm24 [ship2myid_order_data_counter]: ".print_r($cnt, true));		
+		
+		$clm24shipping_address = '';
+		$flag_ship2myid = 0;
+
+        $shipingAddress = $this->getShippingAddress();
+		
+		
+        if($shipingAddress->getFirstname() == Mage::getStoreConfig('clm24core/shippings/ship2myid_label')){
+            //$quote = $this->getQuote();
+            $quote = Mage::getModel('sales/quote')->load($this->getQuoteId());
+            $isMultishippingShip2myid = false;
+            if($quote->getIsMultiShipping()){
+                $isMultishippingShip2myid = true;
+            }
+        }
+		 
+		
+        if($cnt > 0){
+			
+			$resource = Mage::getSingleton('core/resource');
+			$readConnection = $resource->getConnection('core_read');
+			$writeConnection = $resource->getConnection('core_write');
+			$table = $resource->getTableName('myidshipping/shipping');
+			$query = "select value from ".$table." where order_grid_id ='".$orderData[0]["entity_id"]."' and (attribute ='postcode' or attribute ='zipcode')";			
+			$postcode = $readConnection->fetchOne($query);
+			$postcode = ( !is_null($postcode) && !empty($postcode))? $postcode : Mage::getStoreConfig('clm24core/shippings/defaultZipCode');
+			
+			$querynew = "select value from ".$table." where order_grid_id ='".$orderData[0]["entity_id"]."' and (attribute ='country_id' or attribute ='countryCode')";			
+			$country_id = $readConnection->fetchOne($querynew);
+			$country_id = ( !is_null($country_id) && !empty($country_id))? $country_id : Mage::getStoreConfig('clm24core/shippings/country_id');
+			
+			$countryModel = Mage::getModel('directory/country')->loadByCode($country_id);
+
+			$countryName = $countryModel->getName();		
+ 
+			$clm24shipping_address = $clm24shipping_address . Mage::getStoreConfig('clm24core/shippings/ship2myid_label') . "<br>";
+			$clm24shipping_address = $clm24shipping_address . Mage::getStoreConfig('clm24core/shippings/street_line1') . "<br>";
+			$clm24shipping_address = $clm24shipping_address . Mage::getStoreConfig('clm24core/shippings/street_line2') . "<br>";
+			$clm24shipping_address = $clm24shipping_address . Mage::getStoreConfig('clm24core/shippings/city') . "<br>";
+			$clm24shipping_address = $clm24shipping_address . $postcode . "<br>";
+			$clm24shipping_address = $clm24shipping_address . $countryName . "<br>";
+			
+			$flag_ship2myid = 1; 	
+			
+			if (Mage::getStoreConfig('clm24core/shippings/debug') == 1)
+				Mage::Log("Clm24 [ship2myid-address]: ".print_r($clm24shipping_address, true));	
+		}
+		else{
+			
+			$countryModel = Mage::getModel('directory/country')->loadByCode($shipingAddress->getCountry_id());
+
+ $countryName = $countryModel->getName();		
+ 
+			$clm24shipping_address = $clm24shipping_address . $shipingAddress->getName() . "<br>";
+			$clm24shipping_address = $clm24shipping_address . $shipingAddress->getStreetFull() . "<br>";
+			$clm24shipping_address = $clm24shipping_address . $shipingAddress->getCity(). "<br>";
+			$clm24shipping_address = $clm24shipping_address . $shipingAddress->getRegion() . "<br>";			
+			$clm24shipping_address = $clm24shipping_address . $shipingAddress->getPostcode() . "<br>";
+			$clm24shipping_address = $clm24shipping_address . $countryName . "<br>";
+			$clm24shipping_address = $clm24shipping_address . "T : " .$shipingAddress->getTelephone() . "<br>";
+		}
+
+        $mailer->setTemplateParams(array(
+            'order'        => $this,
+            'billing'      => $this->getBillingAddress(),
+            'payment_html' => $paymentBlockHtml,
+            'shipping'     => $clm24shipping_address,
+            'isship2myid' => $flag_ship2myid
+        ));
+
+
+        /** @var $emailQueue Mage_Core_Model_Email_Queue */
+        $emailQueue = Mage::getModel('core/email_queue');
+        $emailQueue->setEntityId($this->getId())
+            ->setEntityType(self::ENTITY)
+            ->setEventType(self::EMAIL_EVENT_NAME_NEW_ORDER)
+            ->setIsForceCheck(!$forceMode);
+
+        $mailer->setQueue($emailQueue)->send();
+
+        $this->setEmailSent(true);
+        $this->_getResource()->saveAttribute($this, 'email_sent');
+
+        return $this;
+    }
+    
 
     /**
      * Retrieve order shipping address
@@ -334,6 +519,7 @@ class Xclm24_Myidshipping_Model_Order extends Mage_Sales_Model_Order
         return false;
     }
 
+    
      /**
      * Retun Ship2MyId Order firstname
      *

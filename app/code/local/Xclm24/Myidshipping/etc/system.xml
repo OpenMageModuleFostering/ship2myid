@@ -38,7 +38,7 @@
             <groups>
                 <clm24_notice translate="label" module="myidshipping">
                     <frontend_model>myidshipping/adminhtml_system_config_fieldset_hint</frontend_model>
-                    <help_link>http://www.mapmyid.com/ship2myid-howitworks</help_link>
+                    <help_link>http://www.ship2myid.com/ship2myid-howitworks</help_link>
                     <sort_order>0</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>

@@ -950,4 +950,44 @@ class Xclm24_Myidshipping_Helper_Data extends Mage_Core_Helper_Abstract
         $_cml24Helper->closeMyIDSession($_clm24Session);
     }
 
+    public function getMarketplaceDetails()
+    {
+        
+        $marketplace_details = array();
+        $session = Mage::getSingleton('core/session');
+        $marketplace_details = $session->getMarketplaceDetails();
+
+        if (Mage::getStoreConfig('clm24core/shippings/debug') == 1) {
+            Mage::Log("Clm24 [marketplace_details]: " . print_r($marketplace_details, true));
+        }
+        
+        if(empty($marketplace_details) ){
+            $marketplace_details = $this->_getMarketplaceDetails();
+            $session->setMarketplaceDetails($marketplace_details);
+        }
+        return $marketplace_details;
+        
+    }
+    
+    private function _getMarketplaceDetails(){
+        
+        $_clm24Session = $this->getMyIDSession();
+        $marketplace_details = array();
+        $url = Mage::getStoreConfig('clm24core/shippings/clm24Url') . "/order/marketplacedetails?";
+        $_requestUrl = $url . "access_token=" . $_clm24Session ;
+        $ch = curl_init($_requestUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        if (Mage::getStoreConfig('clm24core/shippings/debug') == 1) {
+            Mage::Log("Clm24 [marketplace_details API Response]: " . print_r($response, true));
+        }
+        
+        if ($response) {
+            $marketplace_details = Zend_Json::decode($response);
+        }
+        return $marketplace_details;
+    }
 }

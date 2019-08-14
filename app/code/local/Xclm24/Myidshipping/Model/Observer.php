@@ -171,7 +171,8 @@ class Xclm24_Myidshipping_Model_Observer
             $_clm24Data = $session->getData('ship2myid');
             $use_mapmyid = $session->getData('use_mapmyid');
             if (!empty($_clm24Data) && isset($_clm24Data['email']) && $_clm24Data['email'] <> '' && $use_mapmyid) {
-	if ($method->getCode() == 'paypal_express') {
+	$search = stripos($method->getCode(), 'paypal_express');
+	if ($method->getCode() == 'paypal_express' || $search !== false) { 
 	    $result->isAvailable = false;
 	}
             }
@@ -280,6 +281,9 @@ class Xclm24_Myidshipping_Model_Observer
 		"max_shipment" => 1,
 		"order_group_id" => $_clm24Order["external_order_group_id"],
 		"order_status_id" => $_order_status_id,
+		"email" => $_clm24Order['receiver_email_address'],
+		"r_name" => $_clm24Order["receiver_first_name"]. " " . $_clm24Order["receiver_last_name"],
+		"r_telephone" => $tele,
 		"created_at" => date('Y-m-d H:i:s'),
 		"updated_at" => date('Y-m-d H:i:s')
 	            );
@@ -290,6 +294,9 @@ class Xclm24_Myidshipping_Model_Observer
 		"max_shipment" => 0,
 		"order_group_id" => $_clm24Order["external_order_group_id"],
 		"order_status_id" => $_order_status_id,
+		"email" => $_clm24Order['receiver_email_address'],
+		"r_name" => $_clm24Order["receiver_first_name"]. " " . $_clm24Order["receiver_last_name"],
+		"r_telephone" => $tele,
 		"created_at" => date('Y-m-d H:i:s'),
 		"updated_at" => date('Y-m-d H:i:s')
 	            );
@@ -353,6 +360,9 @@ class Xclm24_Myidshipping_Model_Observer
 		"max_shipment" => 1,
 		"order_group_id" => $_clm24Order["external_order_group_id"],
 		"order_status_id" => $_order_status_id,
+		"email" => $_clm24Order['receiver_email_address'],
+		"r_name" => $_clm24Order["receiver_first_name"]. " " . $_clm24Order["receiver_last_name"],
+		"r_telephone" => $tele,
 		"created_at" => date('Y-m-d H:i:s'),
 		"updated_at" => date('Y-m-d H:i:s')
 	            );
@@ -363,6 +373,9 @@ class Xclm24_Myidshipping_Model_Observer
 		"max_shipment" => 0,
 		"order_group_id" => $_clm24Order["external_order_group_id"],
 		"order_status_id" => $_order_status_id,
+		"email" => $_clm24Order['receiver_email_address'],
+		"r_name" => $_clm24Order["receiver_first_name"]. " " . $_clm24Order["receiver_last_name"],
+		"r_telephone" => $tele,
 		"created_at" => date('Y-m-d H:i:s'),
 		"updated_at" => date('Y-m-d H:i:s')
 	            );
@@ -410,10 +423,10 @@ class Xclm24_Myidshipping_Model_Observer
             $collection = $observer->getOrderGridCollection();
             $select = $collection->getSelect();
             $clm24Table = Mage::getSingleton('core/resource')->getTableName('clm24_myidshipping_ordergrid');
-            $clm24MyShipping = Mage::getSingleton('core/resource')->getTableName('clm24_myidshipping');
+            //$clm24MyShipping = Mage::getSingleton('core/resource')->getTableName('clm24_myidshipping');
 
-            $select->joinLeft($clm24Table, 'main_table.increment_id = ' . $clm24Table . '.order_id', array('order_group_id', 'order_status_id', 'max_shipment'));
-            $select->joinLeft(array('clm1' => $clm24MyShipping), $clm24Table . '.entity_id = clm1.order_grid_id AND clm1.attribute = "email" ', array('clm1.value as rec_email'));
+            $select->joinLeft($clm24Table, 'main_table.increment_id = ' . $clm24Table . '.order_id', array('order_group_id', 'order_status_id', 'max_shipment', 'email as rec_email', 'r_telephone as rec_telephone'));  //, 'r_name as shipping_name'
+            //$select->joinLeft(array('clm1' => $clm24MyShipping), $clm24Table . '.entity_id = clm1.order_grid_id AND clm1.attribute = "email" ', array('clm1.value as rec_email'));
             //$select->joinLeft(array('clm2' => $clm24MyShipping), $clm24Table . '.entity_id = clm2.order_grid_id AND clm2.attribute = "firstname" ', array('clm2.value as rec_firstname'));
             //$select->joinLeft(array('clm3' => $clm24MyShipping), $clm24Table . '.entity_id = clm3.order_grid_id AND clm3.attribute = "lastname" ', array( ' CONCAT_WS(" ", clm2.`value` , clm3.`value`) as shipping_name' ));
 
@@ -453,7 +466,7 @@ class Xclm24_Myidshipping_Model_Observer
         if (Mage::getStoreConfig('clm24core/shippings/enabled')) {
             $block = $observer->getEvent()->getBlock();
             $clm24Table = Mage::getSingleton('core/resource')->getTableName('clm24_myidshipping_ordergrid');
-            $clm24MyShipping = Mage::getSingleton('core/resource')->getTableName('clm24_myidshipping');
+            //$clm24MyShipping = Mage::getSingleton('core/resource')->getTableName('clm24_myidshipping');
             if (strpos((get_class($block)), 'Sales_Order_Grid')) {
 	$block->removeColumn('created_at');
 	$block->addColumnAfter('created_at', array(
@@ -467,7 +480,7 @@ class Xclm24_Myidshipping_Model_Observer
 	    'header' => Mage::helper('sales')->__('Rec. Email '),
 	    'index' => 'rec_email',
 	    'width' => '150px',
-	    'filter_index' => 'clm1.value',
+	    'filter_index' => $clm24Table . '.email',
 	        ), 'shipping_name');
 
 	$block->addColumnAfter('order_status_id', array(

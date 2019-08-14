@@ -19,6 +19,18 @@
  */
 
 $base_url = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN);
+$marketplace_details = Mage::Helper('myidshipping')->getMarketplaceDetails();
+$popup_url = Mage::getStoreConfig('clm24core/shippings/clm24popurl'); // . '&callback=' .  $this->getUrl('myidshipping/index/postback') . '&name=' . $marketplace_details['Marketplace']['marketplace_name'] ; 
+
+if(isset($marketplace_details['Marketplace']['marketplace_name']) && !empty($marketplace_details['Marketplace']['marketplace_name'])){
+        $popup_url .= '&name=' . urlencode($marketplace_details['Marketplace']['marketplace_name']);
+}
+if(isset($marketplace_details['Marketplace']['marketplace_image']) && !empty($marketplace_details['Marketplace']['marketplace_image'])){
+        $popup_url .= '&image=' . urlencode($marketplace_details['Marketplace']['marketplace_image']);
+}
+
+$popup_url .= '&callback=' .  $this->getUrl('myidshipping/index/postback');
+
 ?>
 
 <li class="control">
@@ -34,7 +46,7 @@ $base_url = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN);
     <?php endif; ?>
 </li>
 
-<a title="MapMyID Address Book" style="display:none;" id="mapmyidbutton" params="lightwindow_width=<?php echo Mage::getStoreConfig('clm24core/shippings/clm24popwidth') ?>,lightwindow_height=<?php echo Mage::getStoreConfig('clm24core/shippings/clm24popheight') ?>,lightwindow_loading_animation=true" class="lightwindow page-options lightwindow_mapmyid" href="<?php echo Mage::getStoreConfig('clm24core/shippings/clm24popurl') ?>&callback=<?php echo $this->getUrl('myidshipping/index/postback'); ?>">MapMyID Address Book</a>
+<a title="MapMyID Address Book" style="display:none;" id="mapmyidbutton" params="lightwindow_width=<?php echo Mage::getStoreConfig('clm24core/shippings/clm24popwidth') ?>,lightwindow_height=<?php echo Mage::getStoreConfig('clm24core/shippings/clm24popheight') ?>,lightwindow_loading_animation=true" class="lightwindow page-options lightwindow_mapmyid" href="<?php echo $popup_url; ?>">MapMyID Address Book</a>
 <script type="text/javascript">
     $$('.use_mapmyid_label').invoke('observe', 'click', function() {
         document.getElementById("billing:use_myid").checked = true;
