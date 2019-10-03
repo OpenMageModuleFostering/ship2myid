@@ -1,7 +1,7 @@
 {
-    "name": "OpenMageModuleFostering\/Ship2MyID",
+    "name": "openmage-module-fostering\/ship2myid",
     "type": "magento-module",
-    "license": "Open-Software-License-(OSL-3.0)",
+    "license": "OSL-3.0",
     "homepage": "",
     "description": "Generate new orders not possible before. Users can now ship to any cell, email or social ID. NO address needed. Ship to anyone without needing the receiver\u2019s address. ",
     "authors": [
